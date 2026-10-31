@@ -1,0 +1,106 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Citizen profile containing demographic information, economic status, and platform role.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth user ID" },
+        "email": { "type": "string", "description": "Citizen contact email" },
+        "displayName": { "type": "string", "description": "Citizen full name" },
+        "role": { "type": "string", "enum": ["user", "admin"], "description": "User access role" },
+        "age": { "type": "number", "description": "Citizen age in years" },
+        "gender": { "type": "string", "description": "Citizen gender identification" },
+        "state": { "type": "string", "description": "State or Union Territory of residence" },
+        "district": { "type": "string", "description": "District of residence" },
+        "occupation": { "type": "string", "description": "Citizen occupation or profession" },
+        "education": { "type": "string", "description": "Citizen educational attainment" },
+        "annualIncome": { "type": "number", "description": "Annual household income in Indian Rupees" },
+        "incomeRange": { "type": "string", "description": "Categorized income bracket" },
+        "socialCategory": { "type": "string", "description": "Social reservation category" },
+        "isStudent": { "type": "boolean", "description": "Student status flag" },
+        "isFarmer": { "type": "boolean", "description": "Farmer or cultivator status flag" },
+        "isDifferentlyAbled": { "type": "boolean", "description": "Disability status flag" },
+        "isBPL": { "type": "boolean", "description": "Below Poverty Line status flag" },
+        "maritalStatus": { "type": "string", "description": "Marital status" },
+        "createdAt": { "type": "string", "description": "Profile creation timestamp" },
+        "updatedAt": { "type": "string", "description": "Profile update timestamp" }
+      },
+      "required": ["uid", "email", "displayName", "role"]
+    },
+    "Scheme": {
+      "title": "Scheme",
+      "description": "Government scheme data record with official documentation and eligibility criteria.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique scheme slug or identifier" },
+        "name": { "type": "string", "description": "Official title of the scheme" },
+        "shortDescription": { "type": "string", "description": "Concise summary of scheme" },
+        "description": { "type": "string", "description": "Comprehensive explanation of scheme" },
+        "objective": { "type": "string", "description": "Policy goal and welfare objective" },
+        "categoryId": { "type": "string", "description": "Identifier of the scheme category" },
+        "categoryName": { "type": "string", "description": "Human-readable name of the scheme category" },
+        "department": { "type": "string", "description": "Implementing department or authority" },
+        "ministry": { "type": "string", "description": "Union or State Ministry" },
+        "keyBenefit": { "type": "string", "description": "Primary benefit highlight" },
+        "officialUrl": { "type": "string", "description": "Official government scheme portal URL" },
+        "sourceName": { "type": "string", "description": "Name of verification publication source" },
+        "sourceUrl": { "type": "string", "description": "Source documentation URL" },
+        "status": { "type": "string", "enum": ["active", "inactive"], "description": "Publication status" },
+        "featured": { "type": "boolean", "description": "Whether scheme is pinned on dashboard" },
+        "verificationStatus": { "type": "string", "enum": ["Draft", "Needs Review", "Verified", "Inactive"], "description": "Verification status" },
+        "createdAt": { "type": "string", "description": "Creation timestamp" },
+        "updatedAt": { "type": "string", "description": "Last update timestamp" }
+      },
+      "required": ["id", "name", "categoryId", "department", "officialUrl", "sourceName", "sourceUrl", "verificationStatus"]
+    },
+    "SchemeCategory": {
+      "title": "SchemeCategory",
+      "description": "Welfare category organizing multiple government schemes.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique category identifier" },
+        "name": { "type": "string", "description": "Category display name" },
+        "description": { "type": "string", "description": "Category description" },
+        "iconName": { "type": "string", "description": "Lucide icon reference name" },
+        "schemesCount": { "type": "number", "description": "Count of schemes in category" }
+      },
+      "required": ["id", "name", "description", "iconName"]
+    },
+    "SavedScheme": {
+      "title": "SavedScheme",
+      "description": "User bookmarked government scheme.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique bookmark record ID (userId_schemeId)" },
+        "userId": { "type": "string", "description": "Firebase Auth user ID of the citizen" },
+        "schemeId": { "type": "string", "description": "Referenced scheme ID" },
+        "schemeName": { "type": "string", "description": "Scheme title snapshot" },
+        "categoryName": { "type": "string", "description": "Category name snapshot" },
+        "department": { "type": "string", "description": "Department snapshot" },
+        "keyBenefit": { "type": "string", "description": "Key benefit snapshot" },
+        "officialUrl": { "type": "string", "description": "Official portal URL snapshot" },
+        "savedAt": { "type": "string", "description": "Timestamp when saved" }
+      },
+      "required": ["id", "userId", "schemeId", "schemeName", "savedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Citizen profile storage with personal eligibility parameters."
+    },
+    "/schemes/{schemeId}": {
+      "schema": "Scheme",
+      "description": "Collection of government schemes."
+    },
+    "/categories/{categoryId}": {
+      "schema": "SchemeCategory",
+      "description": "Collection of scheme categories."
+    },
+    "/savedSchemes/{saveId}": {
+      "schema": "SavedScheme",
+      "description": "Citizen bookmarks for schemes."
+    }
+  }
+}

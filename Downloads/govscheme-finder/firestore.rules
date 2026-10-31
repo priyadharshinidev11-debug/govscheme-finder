@@ -1,0 +1,60 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if user is admin
+    function isAdmin() {
+      return request.auth != null && 
+        (request.auth.token.admin == true || 
+         request.auth.token.email == '2425018@saec.ac.in' ||
+         (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'));
+    }
+
+    // Helper function to check if user owns the document
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    // User profiles
+    match /users/{userId} {
+      // Users can only read their own document; Admins can read for administrative management
+      allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
+      // Users can create only their own document with role 'user' (unless bootstrapped admin)
+      allow create: if request.auth != null && request.auth.uid == userId && 
+        (request.resource.data.role == 'user' || (isAdmin() && request.resource.data.role in ['user', 'admin']));
+      // Users can update only their own document, and cannot change their role to 'admin' unless already admin
+      allow update: if request.auth != null && (
+        isAdmin() || 
+        (request.auth.uid == userId && 
+         request.resource.data.role == resource.data.role && 
+         request.resource.data.role == 'user')
+      );
+      // Only admins can delete profiles
+      allow delete: if isAdmin();
+    }
+
+    // Government Schemes
+    match /schemes/{schemeId} {
+      // Citizens and visitors can read schemes; Only admins can modify
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Categories
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Saved Schemes (User bookmarks)
+    match /savedSchemes/{saveId} {
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow update: if request.auth != null && 
+        resource.data.userId == request.auth.uid && 
+        request.resource.data.userId == resource.data.userId;
+      allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
+  }
+}

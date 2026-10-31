@@ -1,0 +1,6 @@
+{
+  "name": "GovScheme Finder",
+  "description": "Government scheme discovery, eligibility assessment, and benefits portal for Indian citizens",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
